@@ -4,7 +4,7 @@
 #include <iostream>
 
 int main() {
-
+/*
     auto X = Data::read_data("../data/mnist_x.txt");
     auto Y = Data::read_data("../data/mnist_y.txt");
 
@@ -53,6 +53,12 @@ int main() {
     Data::printData(Y_test);
     std::cout << "Score: " << Data::score(Y_pred_transformed, Y_test) << std::endl;
     std::cout << "Duration: " << to_us(finish_time - start_time) << std::endl;
+*/
+    Eigen::MatrixXd m(2, 2);
+    m << -1, 2, 3, -0.1;
+    auto a = ((m.array() > 0).select(Eigen::MatrixXd::Constant(2, 2, 1).array(), 0)).matrix();
+    std::cout << a << std::endl;
+
 
     return 0;
 }
