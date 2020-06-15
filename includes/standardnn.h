@@ -7,7 +7,7 @@
 #include <mutex>
 #include <random>
 
-#include <tbb/task_scheduler_init.h>
+//#include <tbb/task_scheduler_init.h>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -22,7 +22,7 @@ class StandardNeuralNetwork {
 public:
     StandardNeuralNetwork(const Data::set& X_train, const Data::set& Y_train, const std::vector<int>& layer_dimensions);
 
-    void train(int iter_num = 1000, double learning_rate = 0.25, int num_threads = 1);
+    void train(int iter_num = 1000, double learning_rate = 0.25);
 
     Data::set predict(const Data::set& X_test);
 private:

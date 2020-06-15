@@ -23,14 +23,14 @@ StandardNeuralNetwork::StandardNeuralNetwork(const Data::set& X_train, const Dat
 }
 
 
-void StandardNeuralNetwork::train(int iter_num, double learning_rate, int num_threads) {
+void StandardNeuralNetwork::train(int iter_num, double learning_rate) {
     initialize_parameters();
     std::mutex mtx;
-    if (num_threads > 0)
-        tbb::task_scheduler_init init(num_threads);
+//    if (num_threads > 0)
+//        tbb::task_scheduler_init init(num_threads);
 
     for (int iter = 0; iter < iter_num; iter++) {
-        if (iter % 100 == 0) std::cout << "Iteraion: " << iter << std::endl;
+//        if (iter % 100 == 0) std::cout << "Iteraion: " << iter << std::endl;
 
         tbb::parallel_for( tbb::blocked_range<int>(0,X.size()),
                            [&](tbb::blocked_range<int> r)
