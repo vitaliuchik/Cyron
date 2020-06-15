@@ -1,7 +1,7 @@
 #include "../includes/convolutionalnn.h"
 
 
-ConvolutionalNeuralNetwork::ConvolutionalNeuralNetwork(const Data::set& X_train, const Data::set& Y_train, const std::vector<int>& layer_dimensions) {
+ConvolutionalNeuralNetwork::ConvolutionalNeuralNetwork(const Data::set& X_train, const Data::set& Y_train, int output_size, int height, int width) {
 
     assert(X_train.size() == Y_train.size());
     ConvolutionalNeuralNetwork::vector X_temp = ConvolutionalNeuralNetwork::vector(X_train[0].size());
@@ -17,20 +17,21 @@ ConvolutionalNeuralNetwork::ConvolutionalNeuralNetwork(const Data::set& X_train,
         this->X.push_back(X_temp);
         this->Y.push_back(Y_temp);
     }
-    this->layer_dims = layer_dimensions;
-    this->layer_num = layer_dimensions.size();
-
+    this->output_size = output_size;
+    this->height = height;
+    this->width = width;
 }
 
 
-void ConvolutionalNeuralNetwork::train(int iter_num, double learning_rate, int num_threads) {
+void ConvolutionalNeuralNetwork::train(int iter_num, double learning_rate) {
+    calculate_dims(height, width);
     initialize_parameters();
     std::mutex mtx;
-    if (num_threads > 0)
-        tbb::task_scheduler_init init(num_threads);
+//    if (num_threads > 0)
+//        tbb::task_scheduler_init init(num_threads);
 
     for (int iter = 0; iter < iter_num; iter++) {
-        if (iter % 100 == 0) std::cout << "Iteraion: " << iter << std::endl;
+        if (iter % 50 == 0) std::cout << "Iteraion: " << iter << std::endl;
 
         tbb::parallel_for( tbb::blocked_range<int>(0,X.size()),
                            [&](tbb::blocked_range<int> r)
@@ -57,8 +58,14 @@ Data::set ConvolutionalNeuralNetwork::predict(const Data::set& X_test) {
 
     Data::set Y_res;
     Data::vector Y_temp;
-    for (const auto& X_re : X_res) {
-        auto cache = forward_propagation(X_re, parameters);
+    for (auto X_re : X_res) {
+
+        Eigen::Map<matrix> X_m(X_re.data(), height, width);
+        auto conv_m = convolution(X_m, conv_parameters);
+        assert(conv_m.size() == layer_dims[0]);
+        Eigen::Map<vector> X_v(conv_m.data(), conv_m.size());
+
+        auto cache = forward_propagation(X_v, parameters);
         for (int i = 0; i < layer_dims[layer_num - 1]; i++) {
             Y_temp.push_back(cache["A" + std::to_string(layer_num-1)](i));
         }
