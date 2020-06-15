@@ -8,7 +8,7 @@
 
 int main() {
 
-    snn_tutorial();
+    cnn_tutorial();
 
     return 0;
 }
